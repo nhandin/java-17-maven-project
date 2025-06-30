@@ -1,4 +1,4 @@
-name: Q Code Transformation Java 21
+name: Q Code Transformation
 
 on:
   push:
@@ -34,7 +34,7 @@ jobs:
         java-version: '17'
         distribution: 'adopt'
     
-    - name: Cache Maven packages
+    - name: Cache Maven packages edit 1
       uses: actions/cache@v3
       with:
         path: ~/.m2
@@ -44,35 +44,12 @@ jobs:
     - name: Build with Maven
       run: mvn ${{ env.MAVEN_CLI_OPTS }} verify
     
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-east-1  # Replace with your AWS region
-
-    - name: Run Amazon Q Code Transformation
-      run: |
-        # Install the AWS CLI
-        curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-        unzip awscliv2.zip
-        sudo ./aws/install
-
-        # Run Amazon Q Code Transformation
-        aws q code-transform start-job \
-          --job-type JAVA17_TO_JAVA21 \
-          --source-directory ./ \
-          --output-directory ./transformed \
-          --job-name "Java17to21Transformation"
-
-    - name: Copy dependencies for transformed code
-      run: |
-        cd transformed
-        mvn ${{ env.MAVEN_CLI_OPTS }} dependency:copy-dependencies -DoutputDirectory=dependencies -Dmdep.useRepositoryLayout=true -Dmdep.copyPom=true -Dmdep.addParentPoms=true
+    - name: Copy dependencies
+      run: mvn ${{ env.MAVEN_CLI_OPTS }} dependency:copy-dependencies -DoutputDirectory=dependencies -Dmdep.useRepositoryLayout=true -Dmdep.copyPom=true -Dmdep.addParentPoms=true
     
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
-        name: q-code-transformation-java21
-        path: transformed/dependencies
+        name: q-code-transformation
+        path: dependencies
         retention-days: 1
