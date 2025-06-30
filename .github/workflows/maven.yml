@@ -3,7 +3,7 @@ name: Q Code Transformation
 on:
   push:
     branches:
-      - 'Q-TRANSFORM-issue-*'
+      - 'Q-TRANSFORM-issue-6'
 
 env:
   MAVEN_OPTS: >-
